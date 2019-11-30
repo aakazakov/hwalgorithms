@@ -8,7 +8,7 @@ function getPrimeNumber($index)
     $number = 5;
     $IndexOfPrimeNumber = 3;
     while (true) {
-        $number++;
+        ++$number;
         if ($number%2 && $number%3) ++$IndexOfPrimeNumber;
         if ($IndexOfPrimeNumber === $index) break;
     }
