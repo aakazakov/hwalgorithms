@@ -13,34 +13,41 @@ function getCats()
     $query = "SELECT
                 c.id_category,
                 c.category_name,
-                cl.parent_id
+                cl.parent_id,
+                cl.level
               FROM `categories_db` AS `c`
-              JOIN `category_links` AS `cl`
+              INNER JOIN `category_links` AS `cl`
               ON c.id_category = cl.child_id";
     $res = mysqli_query($link, $query);
-    $cats =[];
+    $cats = [];
     while ($item = mysqli_fetch_assoc($res)) {
-        $cats[$item['parent_id']][$item['id_category']] = $item;
+        if ($item['id_category'] === $item['parent_id']) {
+            $cats['nodes'][$item['id_category']] = $item;
+        }
+        if ($item['id_category'] !== $item['parent_id']) {
+            $cats['branches'][$item['id_category']] = $item;
+        }
     }
     mysqli_close($link);
     return $cats;
 }
 
-function buildTree($arrOfCats, $parent_id)
+function buildTree($cats, $node)
 {
-    if (is_array($arrOfCats) && isset($arrOfCats[$parent_id])) {
-        $tree = "<ul>";
-
-        foreach ($arrOfCats[$parent_id] as $cat) {
-            $tree .= "<li>" . $cat['category_name'];
-            if ($cat['id_category'] !== $parent_id) {
-                $tree .= buildTree($arrOfCats, $cat['id_category']);
+    if (is_array($cats) && isset($cats['nodes'][$node])) {
+        $tree = "<li>" . $cats['nodes'][$node]['category_name'];
+        $tree .= "<ul>";
+        foreach ($cats['branches'] as $cat) {
+            if ($cat['parent_id'] == $node) {
+                if (isset($cats['nodes'][$cat['id_category']])) {
+                    $tree .= buildTree($cats, $cat['id_category']);
+                } else {
+                    $tree .= "<li>" . $cat['category_name'] . "</li>";
+                }
             }
-            $tree .= "</li>";
         }
-
-        $tree .= "</ul>";
-        return $tree;
+        $tree .= "</ul></li>";
+        return "<ul>" . $tree . "</ul>";
     }
     return null;
 }
