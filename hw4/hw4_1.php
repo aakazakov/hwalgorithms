@@ -44,13 +44,13 @@ class TreeBuilder
 class FuncLib
 {
     public static array $priority = [
-        '(' => 5,
-        ')' => 5,
-        '^' => 4,
-        '*' => 3,
-        '/' => 3,
-        '+' => 2,
-        '-' => 2,
+        '(' => 4,
+        ')' => 4,
+        '^' => 3,
+        '*' => 2,
+        '/' => 2,
+        '+' => 1,
+        '-' => 1,
     ];
 
     public static function getPriority(string $char)
