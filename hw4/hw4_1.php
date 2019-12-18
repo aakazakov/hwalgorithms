@@ -2,16 +2,17 @@
 
 class Calculator
 {
-    private TreeBuilder $tree;
+    private array $tree;
 
     public function __construct(string $mathException)
     {
-        $this->tree = new TreeBuilder($mathException);
+        $this->tree = (new TreeBuilder($mathException))->getTree();
     }
 
     public function getResult()
     {
-        return 'result';
+        print_r('tree traversal result: ' . PHP_EOL);
+        return $this->tree;
     }
 }
 
@@ -36,28 +37,25 @@ class TreeBuilder
 
     public function getTree()
     {
-        return 'tree';
+        return ['tree'];
     }
 }
 
 class FuncLib
 {
-    public static function Priority(string $char)
+    public static array $priority = [
+        '(' => 5,
+        ')' => 5,
+        '^' => 4,
+        '*' => 3,
+        '/' => 3,
+        '+' => 2,
+        '-' => 2,
+    ];
+
+    public static function getPriority(string $char)
     {
-        switch ($char) {
-            case '(':
-            case ')':
-                return 4;
-            case '^':
-                return 3;
-            case '*':
-            case '/':
-                return 2;
-            case '+':
-            case '-':
-                return 1;
-        }
-        return 0;
+        return static::$priority[$char] ?: null;
     }
 }
 
