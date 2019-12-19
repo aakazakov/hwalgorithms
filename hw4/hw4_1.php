@@ -25,23 +25,23 @@ class TreeBuilder
         $this->mathException = $mathException;
     }
 
+    public function getTree()
+    {
+        return $this->buildTree();
+    }
+
     private function buildTree()
     {
-
+        return $this->getChars($this->mathException);
     }
 
     private function getChars(string $str) : array
     {
-        return preg_split('//', $str, -1, PREG_SPLIT_NO_EMPTY);
-    }
-
-    public function getTree()
-    {
-        return ['tree'];
+        return preg_split('//', str_replace(' ', '', $str), -1, PREG_SPLIT_NO_EMPTY);
     }
 }
 
-class FuncLib
+class Lib
 {
     public static array $priority = [
         '(' => 4,
@@ -55,10 +55,10 @@ class FuncLib
 
     public static function getPriority(string $char)
     {
-        return static::$priority[$char] ?: null;
+        return static::$priority[$char] ?: 0;
     }
 }
 
-//$test = new Calculator('(x+42)^2+7*y-z');
-//print_r($test->getResult());
+$test = new Calculator('(2 + 1)^2 + 7*3 - 5');
+print_r($test->getResult());
 //print_r((new TreeBuilder('(x+42)^2+7*y-z'))->mathException);
