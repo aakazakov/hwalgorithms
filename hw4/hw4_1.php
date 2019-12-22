@@ -6,6 +6,7 @@
 class Calculator
 {
     private Tree $tree;
+    public static array $params;
 
     public function insert(string $expression) : void
     {
@@ -14,12 +15,7 @@ class Calculator
 
     public function getResult(array $params = null) : float
     {
-        return $this->doComputed($params);
-    }
-
-    private function doComputed(array $params = null) : float
-    {
-        if ($params) return 0;
+        if ($params) self::$params = $params;
         return $this->tree->compute();
     }
 }
@@ -115,6 +111,9 @@ class TreeLeaf extends Tree
 
     public function compute() : float
     {
+        if (!is_numeric($this->value)) {
+            return (float) Calculator::$params[$this->value];
+        }
         return (float) $this->value;
     }
 }
@@ -143,6 +142,6 @@ class Lib
 
 // =========================== //
 $calc = new Calculator();
-//$calc->insert('(x + 4)^2 + 7*y - z');
-$calc->insert('3 + 4^2 + 7*5 - 9');
-print_r($calc->getResult());
+//$calc->insert('3 + 4^2 + 7*5 - 9');
+$calc->insert('x + 4^2 + 7*y - z');
+print_r($calc->getResult(['x' => 3, 'y' => 5, 'z' => 9]));
