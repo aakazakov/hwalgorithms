@@ -12,12 +12,12 @@ class Calculator
         $this->tree = (new TreeBuilder($expression))->getTree();
     }
 
-    public function getResult(array $params = null) : int
+    public function getResult(array $params = null) : float
     {
         return $this->doComputed($params);
     }
 
-    private function doComputed(array $params = null) : int
+    private function doComputed(array $params = null) : float
     {
         if ($params) return 0;
         return $this->tree->compute();
@@ -88,7 +88,7 @@ class TreeNode extends Tree
         $this->value = $value;
     }
 
-    public function compute() : int
+    public function compute() : float
     {
         switch ($this->value) {
             case '+':
@@ -113,9 +113,9 @@ class TreeLeaf extends Tree
         $this->value = $value;
     }
 
-    public function compute() : int
+    public function compute() : float
     {
-        return (int) $this->value;
+        return (float) $this->value;
     }
 }
 
