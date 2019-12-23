@@ -6,7 +6,7 @@
 class Calculator
 {
     private Tree $tree;
-    public static array $params;
+    public static ?array $params = null;
 
     public function insert(string $expression) : void
     {
@@ -59,11 +59,22 @@ class TreeBuilder
         return $treeNode;
     }
 
-    private function formatIt(string $expression) : array
+    private function formatIt(string $expression)
     {
-        return preg_split(
-            '//', str_replace(' ', '', $expression), -1, PREG_SPLIT_NO_EMPTY
-        );
+        $expression = str_split(str_replace(' ', '', $expression));
+        $str = '';
+        for ($i = 0; $i < count($expression); $i++) {
+            if (is_numeric($expression[$i]) || $expression[$i] === '.') {
+                while (is_numeric($expression[$i]) || $expression[$i] === '.') {
+                    $str .= $expression[$i++];
+                }
+                $i--;
+                $str .= ' ';
+            } else {
+                $str .= $expression[$i] . ' ';
+            }
+        }
+        return preg_split("/ /", rtrim($str), -1, PREG_SPLIT_NO_EMPTY);
     }
 }
 
@@ -142,6 +153,5 @@ class Lib
 
 // =========================== //
 $calc = new Calculator();
-//$calc->insert('3 + 4^2 + 7*5 - 9');
-$calc->insert('x + 4^2 + 7*y - z');
+$calc->insert('x + 4^2 + 7*y - z + 15 - 10.5');
 print_r($calc->getResult(['x' => 3, 'y' => 5, 'z' => 9]));
