@@ -1,7 +1,6 @@
 <?php
 
 /* Реализовать построение и обход дерева для математического выражения. */
-// (x+4)^2+7*y-z.
 
 class Calculator
 {
@@ -40,9 +39,32 @@ class TreeBuilder
 
     private function buildTree(int $leftEdge, int $rightEdge) : Tree
     {
+        if ($this->stuff[$leftEdge] === '(' && $this->stuff[$rightEdge] === ')') {
+            ++$leftEdge;
+            --$rightEdge;
+        }
         if ($leftEdge === $rightEdge) return new TreeLeaf($this->stuff[$rightEdge]);
         $lowestPriorityItem = [];
         for ($i = $rightEdge; $i > $leftEdge; $i--) {
+            if ($this->stuff[$i] === ')') {
+                for ($j = $leftEdge; $j < $rightEdge; $j++) {
+                    if ($this->stuff[$j] === '(') {
+                        $treeNode = new TreeNode($this->stuff[$lowestPriorityItem['index']]);
+                        $treeNode->right = $this->buildTree($lowestPriorityItem['index'] + 1, $rightEdge);
+                        $treeNode->left = $this->buildTree($leftEdge, $lowestPriorityItem['index'] - 1);
+                        return $treeNode;
+                    }
+                    if (Lib::isOperator($this->stuff[$j])) {
+                        if (
+                            empty($lowestPriorityItem)
+                            || $lowestPriorityItem['priority'] >= Lib::getPriority($this->stuff[$j])
+                        ) {
+                            $lowestPriorityItem['index'] = $j;
+                            $lowestPriorityItem['priority'] = Lib::getPriority($this->stuff[$j]);
+                        }
+                    }
+                }
+            }
             if (Lib::isOperator($this->stuff[$i])) {
                 if (
                     empty($lowestPriorityItem)
@@ -59,7 +81,28 @@ class TreeBuilder
         return $treeNode;
     }
 
-    private function formatIt(string $expression)
+//    private function buildTree(int $leftEdge, int $rightEdge) : Tree
+//    {
+//        if ($leftEdge === $rightEdge) return new TreeLeaf($this->stuff[$rightEdge]);
+//        $lowestPriorityItem = [];
+//        for ($i = $rightEdge; $i > $leftEdge; $i--) {
+//            if (Lib::isOperator($this->stuff[$i])) {
+//                if (
+//                    empty($lowestPriorityItem)
+//                    || $lowestPriorityItem['priority'] > Lib::getPriority($this->stuff[$i])
+//                ) {
+//                    $lowestPriorityItem['index'] = $i;
+//                    $lowestPriorityItem['priority'] = Lib::getPriority($this->stuff[$i]);
+//                }
+//            }
+//        }
+//        $treeNode = new TreeNode($this->stuff[$lowestPriorityItem['index']]);
+//        $treeNode->right = $this->buildTree($lowestPriorityItem['index'] + 1, $rightEdge);
+//        $treeNode->left = $this->buildTree($leftEdge, $lowestPriorityItem['index'] - 1);
+//        return $treeNode;
+//    }
+
+    private function formatIt(string $expression) : array
     {
         $expression = str_split(str_replace(' ', '', $expression));
         $str = '';
@@ -74,7 +117,7 @@ class TreeBuilder
                 $str .= $expression[$i] . ' ';
             }
         }
-        return preg_split("/ /", rtrim($str), -1, PREG_SPLIT_NO_EMPTY);
+        return preg_split("/ /", $str, -1, PREG_SPLIT_NO_EMPTY);
     }
 }
 
@@ -153,5 +196,7 @@ class Lib
 
 // =========================== //
 $calc = new Calculator();
-$calc->insert('x + 4^2 + 7*y - z + 15 - 10.5');
+//$calc->insert('x + 4^2 + 7*y - z + 15 - 10.5');
+$calc->insert('x + 4^2 + 7*(z - y) + 15 - 10.5');
+
 print_r($calc->getResult(['x' => 3, 'y' => 5, 'z' => 9]));
